@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -20,6 +19,7 @@ import {
 import { loadState, saveState, MoneyTrackerState } from '@/utils/storageService';
 import { PlayCircle, StopCircle, IndianRupee, Clock, TrendingUp, RefreshCw } from 'lucide-react';
 import ThemePicker from '@/components/ThemePicker';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const MoneyTracker: React.FC = () => {
   // State
@@ -34,6 +34,9 @@ const MoneyTracker: React.FC = () => {
   const [chartData, setChartData] = useState<Array<{ label: string; value: number }>>([]);
   const [projectionData, setProjectionData] = useState<Array<{ date: string; amount: number; growth: number }>>([]);
   const [amountEarned, setAmountEarned] = useState<number>(0);
+  
+  // Check if on mobile
+  const isMobile = useIsMobile();
   
   // Refs
   const timerRef = useRef<number | null>(null);
@@ -380,51 +383,53 @@ const MoneyTracker: React.FC = () => {
   };
   
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="grid grid-cols-1 gap-6">
+    <div className="container mx-auto py-4 md:py-8 px-2 md:px-4">
+      <div className="grid grid-cols-1 gap-4 md:gap-6">
         {/* Header with Theme Picker */}
-        <div className="flex justify-between items-center mb-8">
-          <div className="text-center flex-1">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2 text-transparent bg-clip-text bg-money-gradient">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 md:mb-8">
+          <div className="text-center md:text-left flex-1 mb-4 md:mb-0">
+            <h1 className="text-2xl md:text-4xl font-bold mb-2 text-transparent bg-clip-text bg-money-gradient">
               Paisa Pragati Tracker
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto md:mx-0">
               Watch your money grow in real-time with our interactive tracker.
               Enter your initial amount, interest rate, and time period to see your wealth accumulate second by second.
             </p>
           </div>
-          <ThemePicker />
+          <div className="flex justify-center md:justify-end">
+            <ThemePicker />
+          </div>
         </div>
         
         {/* Money Counter */}
         <Card className="shadow-lg border-2 border-money-light">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center justify-center">
-              <IndianRupee className="w-6 h-6 mr-2 text-money-primary" />
+            <CardTitle className="flex items-center justify-center text-lg md:text-xl">
+              <IndianRupee className="w-5 h-5 md:w-6 md:h-6 mr-2 text-money-primary" />
               <span>Current Value</span>
             </CardTitle>
-            <CardDescription>Watch your money grow in real-time</CardDescription>
+            <CardDescription className="text-xs md:text-sm">Watch your money grow in real-time</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center">
-            <div className="text-4xl md:text-6xl font-bold py-8 money-counter text-money-primary animate-money-pulse">
+            <div className="text-3xl md:text-6xl font-bold py-4 md:py-8 money-counter text-money-primary animate-money-pulse">
               {formatToIndianCurrency(currentAmount)}
             </div>
-            <div className="flex gap-3 mt-4 w-full max-w-sm">
+            <div className="flex gap-2 md:gap-3 mt-2 md:mt-4 w-full max-w-xs md:max-w-sm">
               <Button 
                 onClick={handleToggleTimer}
                 className={isRunning ? "bg-destructive hover:bg-destructive/90" : "bg-money-primary hover:bg-money-primary/90"}
-                size="lg"
+                size={isMobile ? "default" : "lg"}
                 variant="default"
                 disabled={!initialAmount || !interestRate || !timeYears}
               >
                 {isRunning ? (
                   <>
-                    <StopCircle className="mr-2 h-5 w-5" />
+                    <StopCircle className="mr-1 md:mr-2 h-4 w-4 md:h-5 md:w-5" />
                     Stop
                   </>
                 ) : (
                   <>
-                    <PlayCircle className="mr-2 h-5 w-5" />
+                    <PlayCircle className="mr-1 md:mr-2 h-4 w-4 md:h-5 md:w-5" />
                     Start
                   </>
                 )}
@@ -432,11 +437,11 @@ const MoneyTracker: React.FC = () => {
               <Button 
                 onClick={handleReset}
                 className="bg-muted hover:bg-muted/80 text-foreground"
-                size="lg"
+                size={isMobile ? "default" : "lg"}
                 variant="outline"
                 disabled={!isRunning && currentAmount === parseIndianCurrency(initialAmount)}
               >
-                <RefreshCw className="mr-2 h-5 w-5" />
+                <RefreshCw className="mr-1 md:mr-2 h-4 w-4 md:h-5 md:w-5" />
                 Reset
               </Button>
             </div>
@@ -445,17 +450,17 @@ const MoneyTracker: React.FC = () => {
         
         {/* Input Form */}
         <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <TrendingUp className="w-5 h-5 mr-2 text-money-primary" />
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center text-lg md:text-xl">
+              <TrendingUp className="w-4 h-4 md:w-5 md:h-5 mr-2 text-money-primary" />
               <span>Investment Parameters</span>
             </CardTitle>
-            <CardDescription>Enter your investment details</CardDescription>
+            <CardDescription className="text-xs md:text-sm">Enter your investment details</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
               <div className="space-y-2">
-                <Label htmlFor="initialAmount">Initial Amount (₹)</Label>
+                <Label htmlFor="initialAmount" className="text-sm">Initial Amount (₹)</Label>
                 <Input
                   id="initialAmount"
                   value={initialAmount}
@@ -463,11 +468,11 @@ const MoneyTracker: React.FC = () => {
                   onBlur={handleAmountBlur}
                   placeholder="₹1,00,000.00"
                   disabled={isRunning}
-                  className="border-money-primary/20 focus:border-money-primary"
+                  className="border-money-primary/20 focus:border-money-primary text-sm md:text-base"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="interestRate">Annual Interest Rate (%)</Label>
+                <Label htmlFor="interestRate" className="text-sm">Annual Interest Rate (%)</Label>
                 <Input
                   id="interestRate"
                   value={interestRate}
@@ -478,11 +483,11 @@ const MoneyTracker: React.FC = () => {
                   min="0"
                   max="100"
                   disabled={isRunning}
-                  className="border-money-primary/20 focus:border-money-primary"
+                  className="border-money-primary/20 focus:border-money-primary text-sm md:text-base"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="timeYears">Time Period (Years)</Label>
+                <Label htmlFor="timeYears" className="text-sm">Time Period (Years)</Label>
                 <Input
                   id="timeYears"
                   value={timeYears}
@@ -493,12 +498,12 @@ const MoneyTracker: React.FC = () => {
                   min="0.5"
                   max="100"
                   disabled={isRunning}
-                  className="border-money-primary/20 focus:border-money-primary"
+                  className="border-money-primary/20 focus:border-money-primary text-sm md:text-base"
                 />
               </div>
             </div>
             <Button 
-              className="mt-6 w-full md:w-auto md:px-8 bg-money-primary hover:bg-money-primary/90"
+              className="mt-4 md:mt-6 w-full md:w-auto md:px-8 bg-money-primary hover:bg-money-primary/90 text-sm md:text-base"
               onClick={handleCalculate}
               disabled={isRunning || !initialAmount || !interestRate || !timeYears}
             >
@@ -510,36 +515,36 @@ const MoneyTracker: React.FC = () => {
         {/* Time Tracker with Amount Earned */}
         <Card className="shadow-md">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center">
-              <Clock className="w-5 h-5 mr-2 text-money-primary" />
+            <CardTitle className="flex items-center text-lg md:text-xl">
+              <Clock className="w-4 h-4 md:w-5 md:h-5 mr-2 text-money-primary" />
               <span>Time Elapsed</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">
+            <div className="mb-2 flex items-center justify-between text-xs md:text-sm">
+              <span className="text-muted-foreground">
                 0
               </span>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-muted-foreground">
                 {formatTimeElapsed(totalSecondsRef.current)}
               </span>
             </div>
             <Progress value={timeElapsedPercentage} className="h-2 bg-muted" />
             <div className="mt-4 flex flex-col md:flex-row md:justify-between items-center">
               <div className="text-center mb-3 md:mb-0">
-                <div className="text-xl font-medium">
+                <div className="text-lg md:text-xl font-medium">
                   {formatTimeElapsed(elapsedSeconds)}
                 </div>
-                <div className="text-sm text-muted-foreground mt-1">
+                <div className="text-xs md:text-sm text-muted-foreground mt-1">
                   {timeElapsedPercentage.toFixed(2)}% complete
                 </div>
               </div>
-              <div className="text-center bg-money-light/50 p-3 rounded-lg">
-                <div className="text-sm text-muted-foreground">Amount Earned</div>
-                <div className="text-xl font-medium text-money-primary">
+              <div className="text-center bg-money-light/50 p-3 rounded-lg w-full md:w-auto">
+                <div className="text-xs md:text-sm text-muted-foreground">Amount Earned</div>
+                <div className="text-lg md:text-xl font-medium text-money-primary">
                   {formatToIndianCurrency(amountEarned)}
                 </div>
-                <div className="text-sm text-muted-foreground mt-1">
+                <div className="text-xs md:text-sm text-muted-foreground mt-1">
                   {initialAmountRef.current > 0 ? ((amountEarned / initialAmountRef.current) * 100).toFixed(2) : 0}% growth
                 </div>
               </div>
@@ -550,22 +555,28 @@ const MoneyTracker: React.FC = () => {
         {/* Chart */}
         <Card className="shadow-md chart-container">
           <CardHeader>
-            <CardTitle>Growth Projection</CardTitle>
-            <CardDescription>Visualize your investment growth over time</CardDescription>
+            <CardTitle className="text-lg md:text-xl">Growth Projection</CardTitle>
+            <CardDescription className="text-xs md:text-sm">Visualize your investment growth over time</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] w-full">
+            <div className="h-[250px] md:h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={chartData.map(item => ({ name: item.label, value: item.value }))}
-                  margin={{ top: 5, right: 20, left: 20, bottom: 20 }}
+                  margin={{ 
+                    top: 5, 
+                    right: isMobile ? 10 : 20, 
+                    left: isMobile ? 10 : 20, 
+                    bottom: 20 
+                  }}
                 >
                   <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
                   <XAxis 
                     dataKey="name" 
-                    tick={{ fontSize: 12 }}
+                    tick={{ fontSize: isMobile ? 10 : 12 }}
                     tickLine={{ stroke: '#E5E7EB' }}
                     axisLine={{ stroke: '#E5E7EB' }}
+                    interval={isMobile ? 'preserveStartEnd' : 0}
                   />
                   <YAxis 
                     tickFormatter={(value) => {
@@ -573,18 +584,19 @@ const MoneyTracker: React.FC = () => {
                       if (value >= 1000) return `₹${(value / 1000).toFixed(1)}K`;
                       return `₹${value}`;
                     }}
-                    tick={{ fontSize: 12 }}
+                    tick={{ fontSize: isMobile ? 10 : 12 }}
                     tickLine={{ stroke: '#E5E7EB' }}
                     axisLine={{ stroke: '#E5E7EB' }}
+                    width={isMobile ? 40 : 60}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <Line 
                     type="monotone" 
                     dataKey="value" 
                     stroke="hsl(var(--money-primary))" 
-                    strokeWidth={3}
-                    dot={{ r: 4, strokeWidth: 2 }}
-                    activeDot={{ r: 6, strokeWidth: 2 }}
+                    strokeWidth={isMobile ? 2 : 3}
+                    dot={{ r: isMobile ? 3 : 4, strokeWidth: isMobile ? 1 : 2 }}
+                    activeDot={{ r: isMobile ? 5 : 6, strokeWidth: isMobile ? 1 : 2 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -595,27 +607,27 @@ const MoneyTracker: React.FC = () => {
         {/* Table */}
         <Card className="shadow-md">
           <CardHeader>
-            <CardTitle>Yearly Projection</CardTitle>
-            <CardDescription>Year-by-year breakdown of your investment</CardDescription>
+            <CardTitle className="text-lg md:text-xl">Yearly Projection</CardTitle>
+            <CardDescription className="text-xs md:text-sm">Year-by-year breakdown of your investment</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
+            <div className="overflow-x-auto -mx-4 px-4">
+              <table className="w-full border-collapse min-w-[400px]">
                 <thead>
                   <tr className="bg-muted">
-                    <th className="p-3 text-left font-medium border-b">Date</th>
-                    <th className="p-3 text-left font-medium border-b">Projected Amount</th>
-                    <th className="p-3 text-left font-medium border-b">Annual Growth</th>
+                    <th className="p-2 md:p-3 text-left font-medium border-b text-xs md:text-sm">Date</th>
+                    <th className="p-2 md:p-3 text-left font-medium border-b text-xs md:text-sm">Projected Amount</th>
+                    <th className="p-2 md:p-3 text-left font-medium border-b text-xs md:text-sm">Annual Growth</th>
                   </tr>
                 </thead>
                 <tbody>
                   {projectionData.map((item, index) => (
                     <tr key={index} className={index % 2 === 0 ? 'bg-background' : 'bg-muted/30'}>
-                      <td className="p-3 border-b">{item.date}</td>
-                      <td className="p-3 border-b font-medium text-money-primary">
+                      <td className="p-2 md:p-3 border-b text-xs md:text-sm">{item.date}</td>
+                      <td className="p-2 md:p-3 border-b font-medium text-money-primary text-xs md:text-sm">
                         {formatToIndianCurrency(item.amount)}
                       </td>
-                      <td className="p-3 border-b">
+                      <td className="p-2 md:p-3 border-b text-xs md:text-sm">
                         <span className={item.growth > 0 ? 'text-money-primary' : 'text-destructive'}>
                           {item.growth.toFixed(2)}%
                         </span>
