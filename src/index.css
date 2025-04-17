@@ -55,7 +55,7 @@
     --popover: 142 30% 15%;
     --popover-foreground: 142 10% 90%;
 
-    --primary: 142 76% 36%;
+    --primary: 142 70% 50%;
     --primary-foreground: 0 0% 98%;
 
     --secondary: 84 61% 45%;
@@ -95,8 +95,19 @@
   }
 }
 
+/* Make the colors for the money counter adapt to the theme */
+.dark .money-counter {
+  @apply text-green-400;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 .money-counter {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Adjust chart styles for dark mode */
+.dark .chart-container {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .chart-container {
@@ -104,5 +115,5 @@
 }
 
 .glassmorphism {
-  @apply bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg;
+  @apply bg-white/80 dark:bg-black/30 backdrop-blur-sm border border-white/20 shadow-lg;
 }

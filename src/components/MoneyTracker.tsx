@@ -17,7 +17,8 @@ import {
   calculateProjectionData
 } from '@/utils/moneyUtils';
 import { loadState, saveState, MoneyTrackerState } from '@/utils/storageService';
-import { PlayCircle, StopCircle, IndianRupee, Clock, TrendingUp, RefreshCw } from 'lucide-react';
+import { PlayCircle, StopCircle, IndianRupee, Clock, TrendingUp, RefreshCw, Moon, Sun } from 'lucide-react';
+import ThemePicker from '@/components/ThemePicker';
 
 const MoneyTracker: React.FC = () => {
   // State
@@ -31,6 +32,7 @@ const MoneyTracker: React.FC = () => {
   const [timeElapsedPercentage, setTimeElapsedPercentage] = useState<number>(0);
   const [chartData, setChartData] = useState<Array<{ label: string; value: number }>>([]);
   const [projectionData, setProjectionData] = useState<Array<{ date: string; amount: number; growth: number }>>([]);
+  const [amountEarned, setAmountEarned] = useState<number>(0);
   
   // Refs
   const timerRef = useRef<number | null>(null);
@@ -38,6 +40,7 @@ const MoneyTracker: React.FC = () => {
   const amountPerSecondRef = useRef<number>(0);
   const finalAmountRef = useRef<number>(0);
   const totalSecondsRef = useRef<number>(0);
+  const initialAmountRef = useRef<number>(0);
   
   // Load saved state on component mount
   useEffect(() => {
@@ -104,6 +107,11 @@ const MoneyTracker: React.FC = () => {
       );
     }
     
+    // Calculate amount earned
+    if (savedState.currentAmount > savedState.initialAmount) {
+      setAmountEarned(savedState.currentAmount - savedState.initialAmount);
+    }
+    
     // Cleanup function
     return () => {
       if (timerRef.current !== null) {
@@ -129,6 +137,7 @@ const MoneyTracker: React.FC = () => {
     
     const amountPerSecond = calculateAmountPerSecond(principal, finalAmount, time);
     amountPerSecondRef.current = amountPerSecond;
+    initialAmountRef.current = principal;
     
     // Set initial state
     setCurrentAmount(starting);
@@ -153,6 +162,9 @@ const MoneyTracker: React.FC = () => {
       // Calculate new amount
       const newAmount = principal + (amountPerSecond * elapsed);
       setCurrentAmount(newAmount);
+      
+      // Calculate amount earned
+      setAmountEarned(newAmount - principal);
       
       // Update chart data periodically
       if (Math.floor(elapsed) % 10 === 0) {
@@ -235,9 +247,13 @@ const MoneyTracker: React.FC = () => {
       // Reset elapsed time
       setElapsedSeconds(0);
       setTimeElapsedPercentage(0);
+      initialAmountRef.current = parsedInitialAmount;
       
       // Set current amount to initial amount
       setCurrentAmount(parsedInitialAmount);
+      
+      // Reset amount earned
+      setAmountEarned(0);
       
       // Generate chart data
       const finalAmount = calculateFinalAmount(
@@ -253,6 +269,14 @@ const MoneyTracker: React.FC = () => {
         parsedInitialAmount
       );
       setChartData(data);
+      
+      // Update projection table data
+      const tableData = calculateProjectionData(
+        parsedInitialAmount,
+        finalAmount,
+        parsedTimeYears
+      );
+      setProjectionData(tableData);
       
       // Save new values to state
       saveState({
@@ -314,6 +338,7 @@ const MoneyTracker: React.FC = () => {
     setCurrentAmount(state.initialAmount);
     setElapsedSeconds(0);
     setTimeElapsedPercentage(0);
+    setAmountEarned(0);
     
     toast.info("Counter reset to initial amount");
   };
@@ -347,15 +372,18 @@ const MoneyTracker: React.FC = () => {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="grid grid-cols-1 gap-6">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-transparent bg-clip-text bg-money-gradient">
-            Paisa Pragati Tracker
-          </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Watch your money grow in real-time with our interactive tracker.
-            Enter your initial amount, interest rate, and time period to see your wealth accumulate second by second.
-          </p>
+        {/* Header with Theme Picker */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="text-center flex-1">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2 text-transparent bg-clip-text bg-money-gradient">
+              Paisa Pragati Tracker
+            </h1>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Watch your money grow in real-time with our interactive tracker.
+              Enter your initial amount, interest rate, and time period to see your wealth accumulate second by second.
+            </p>
+          </div>
+          <ThemePicker />
         </div>
         
         {/* Money Counter */}
@@ -469,7 +497,7 @@ const MoneyTracker: React.FC = () => {
           </CardContent>
         </Card>
         
-        {/* Time Tracker */}
+        {/* Time Tracker with Amount Earned */}
         <Card className="shadow-md">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center">
@@ -487,12 +515,23 @@ const MoneyTracker: React.FC = () => {
               </span>
             </div>
             <Progress value={timeElapsedPercentage} className="h-2 bg-muted" />
-            <div className="mt-4 text-center">
-              <div className="text-xl font-medium">
-                {formatTimeElapsed(elapsedSeconds)}
+            <div className="mt-4 flex flex-col md:flex-row md:justify-between items-center">
+              <div className="text-center mb-3 md:mb-0">
+                <div className="text-xl font-medium">
+                  {formatTimeElapsed(elapsedSeconds)}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  {timeElapsedPercentage.toFixed(2)}% complete
+                </div>
               </div>
-              <div className="text-sm text-muted-foreground mt-1">
-                {timeElapsedPercentage.toFixed(2)}% complete
+              <div className="text-center bg-money-light/50 p-3 rounded-lg">
+                <div className="text-sm text-muted-foreground">Amount Earned</div>
+                <div className="text-xl font-medium text-money-primary">
+                  {formatToIndianCurrency(amountEarned)}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  {initialAmountRef.current > 0 ? ((amountEarned / initialAmountRef.current) * 100).toFixed(2) : 0}% growth
+                </div>
               </div>
             </div>
           </CardContent>
