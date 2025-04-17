@@ -17,7 +17,7 @@ import {
   calculateProjectionData
 } from '@/utils/moneyUtils';
 import { loadState, saveState, MoneyTrackerState } from '@/utils/storageService';
-import { PlayCircle, StopCircle, IndianRupee, Clock, TrendingUp, Refresh } from 'lucide-react';
+import { PlayCircle, StopCircle, IndianRupee, Clock, TrendingUp, RefreshCw } from 'lucide-react';
 
 const MoneyTracker: React.FC = () => {
   // State
@@ -398,7 +398,7 @@ const MoneyTracker: React.FC = () => {
                 variant="outline"
                 disabled={!isRunning && currentAmount === parseIndianCurrency(initialAmount)}
               >
-                <Refresh className="mr-2 h-5 w-5" />
+                <RefreshCw className="mr-2 h-5 w-5" />
                 Reset
               </Button>
             </div>
