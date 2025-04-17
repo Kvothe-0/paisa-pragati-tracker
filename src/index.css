@@ -43,6 +43,54 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Money theme color - green by default */
+    --money-primary: 142 76% 36%;
+    --money-secondary: 84 61% 45%;
+    --money-accent: 199 87% 48%;
+    --money-highlight: 210 79% 54%;
+    --money-light: 142 52% 96%;
+    --money-dark: 142 30% 15%;
+  }
+
+  /* Blue theme */
+  .theme-blue {
+    --money-primary: 210 79% 46%;
+    --money-secondary: 199 89% 48%;
+    --money-accent: 217 91% 60%;
+    --money-highlight: 224 76% 48%;
+    --money-light: 210 79% 96%;
+    --money-dark: 210 79% 16%;
+  }
+
+  /* Purple theme */
+  .theme-purple {
+    --money-primary: 267 83% 60%;
+    --money-secondary: 250 95% 76%;
+    --money-accent: 262 83% 58%;
+    --money-highlight: 256 100% 65%;
+    --money-light: 267 83% 95%;
+    --money-dark: 267 83% 25%;
+  }
+
+  /* Orange theme */
+  .theme-orange {
+    --money-primary: 27 96% 61%;
+    --money-secondary: 37 92% 50%;
+    --money-accent: 21 90% 48%;
+    --money-highlight: 32 95% 44%;
+    --money-light: 27 96% 96%;
+    --money-dark: 27 96% 25%;
+  }
+
+  /* Red theme */
+  .theme-red {
+    --money-primary: 0 84% 60%;
+    --money-secondary: 0 73% 50%;
+    --money-accent: 0 92% 45%;
+    --money-highlight: 0 74% 39%;
+    --money-light: 0 84% 96%;
+    --money-dark: 0 84% 25%;
   }
 
   .dark {
@@ -97,7 +145,7 @@
 
 /* Make the colors for the money counter adapt to the theme */
 .dark .money-counter {
-  @apply text-green-400;
+  @apply text-money-primary;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -116,4 +164,39 @@
 
 .glassmorphism {
   @apply bg-white/80 dark:bg-black/30 backdrop-blur-sm border border-white/20 shadow-lg;
+}
+
+/* Define dynamic theme properties for colors */
+.text-money-primary {
+  color: hsl(var(--money-primary));
+}
+
+.bg-money-primary {
+  background-color: hsl(var(--money-primary));
+}
+
+.hover\:bg-money-primary\/90:hover {
+  background-color: hsla(var(--money-primary), 0.9);
+}
+
+.border-money-primary\/20 {
+  border-color: hsla(var(--money-primary), 0.2);
+}
+
+.focus\:border-money-primary:focus {
+  border-color: hsl(var(--money-primary));
+}
+
+.bg-money-light\/50 {
+  background-color: hsla(var(--money-light), 0.5);
+}
+
+.border-money-light {
+  border-color: hsl(var(--money-light));
+}
+
+.bg-money-gradient {
+  background-image: linear-gradient(135deg, 
+    hsl(var(--money-primary)) 0%, 
+    hsl(var(--money-secondary)) 100%);
 }

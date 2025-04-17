@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,7 +18,7 @@ import {
   calculateProjectionData
 } from '@/utils/moneyUtils';
 import { loadState, saveState, MoneyTrackerState } from '@/utils/storageService';
-import { PlayCircle, StopCircle, IndianRupee, Clock, TrendingUp, RefreshCw, Moon, Sun } from 'lucide-react';
+import { PlayCircle, StopCircle, IndianRupee, Clock, TrendingUp, RefreshCw } from 'lucide-react';
 import ThemePicker from '@/components/ThemePicker';
 
 const MoneyTracker: React.FC = () => {
@@ -87,7 +88,7 @@ const MoneyTracker: React.FC = () => {
       );
       setChartData(data);
       
-      // Generate projection data for table
+      // Generate projection data for table with yearly intervals
       const tableData = calculateProjectionData(
         parsedInitialAmount,
         calculatedFinalAmount,
@@ -144,7 +145,7 @@ const MoneyTracker: React.FC = () => {
     setStartTimestamp(startTime);
     setIsRunning(true);
     
-    // Generate projection data for table
+    // Generate projection data for table with yearly intervals
     const tableData = calculateProjectionData(principal, finalAmount, time);
     setProjectionData(tableData);
     
@@ -270,7 +271,7 @@ const MoneyTracker: React.FC = () => {
       );
       setChartData(data);
       
-      // Update projection table data
+      // Update projection table data with yearly intervals
       const tableData = calculateProjectionData(
         parsedInitialAmount,
         finalAmount,
@@ -288,7 +289,16 @@ const MoneyTracker: React.FC = () => {
         currentAmount: parsedInitialAmount
       });
       
-      toast.success("Calculation updated successfully!");
+      // Automatically start the timer after calculating
+      startTimer(
+        parsedInitialAmount,
+        parsedInterestRate,
+        parsedTimeYears,
+        parsedInitialAmount,
+        Date.now()
+      );
+      
+      toast.success("Calculation updated and timer started!");
     } catch (error) {
       console.error("Error calculating values:", error);
       toast.error("An error occurred. Please check your inputs.");
@@ -357,7 +367,7 @@ const MoneyTracker: React.FC = () => {
   const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 rounded-md shadow-md border border-gray-200">
+        <div className="bg-white dark:bg-card p-3 rounded-md shadow-md border border-gray-200 dark:border-gray-700">
           <p className="text-sm font-medium">{label}</p>
           <p className="text-sm text-money-primary">
             {formatToIndianCurrency(payload[0].value as number)}
@@ -571,7 +581,7 @@ const MoneyTracker: React.FC = () => {
                   <Line 
                     type="monotone" 
                     dataKey="value" 
-                    stroke="#4CAF50" 
+                    stroke="hsl(var(--money-primary))" 
                     strokeWidth={3}
                     dot={{ r: 4, strokeWidth: 2 }}
                     activeDot={{ r: 6, strokeWidth: 2 }}
@@ -585,7 +595,7 @@ const MoneyTracker: React.FC = () => {
         {/* Table */}
         <Card className="shadow-md">
           <CardHeader>
-            <CardTitle>Projection Table</CardTitle>
+            <CardTitle>Yearly Projection</CardTitle>
             <CardDescription>Year-by-year breakdown of your investment</CardDescription>
           </CardHeader>
           <CardContent>
@@ -595,7 +605,7 @@ const MoneyTracker: React.FC = () => {
                   <tr className="bg-muted">
                     <th className="p-3 text-left font-medium border-b">Date</th>
                     <th className="p-3 text-left font-medium border-b">Projected Amount</th>
-                    <th className="p-3 text-left font-medium border-b">Growth Rate</th>
+                    <th className="p-3 text-left font-medium border-b">Annual Growth</th>
                   </tr>
                 </thead>
                 <tbody>

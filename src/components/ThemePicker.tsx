@@ -1,17 +1,20 @@
 
 import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Moon, Sun, Laptop } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
+import { Moon, Sun, Laptop, Palette } from "lucide-react";
 
 type Theme = "light" | "dark" | "system";
+type ThemeColor = "green" | "blue" | "purple" | "orange" | "red";
 
 const ThemePicker: React.FC = () => {
   const [theme, setTheme] = useState<Theme>("system");
+  const [themeColor, setThemeColor] = useState<ThemeColor>("green");
 
   useEffect(() => {
-    // Check if user has a saved theme preference
+    // Check if user has saved theme preferences
     const savedTheme = localStorage.getItem("paisa-pragati-theme") as Theme | null;
+    const savedColor = localStorage.getItem("paisa-pragati-color") as ThemeColor | null;
     
     if (savedTheme) {
       setTheme(savedTheme);
@@ -27,6 +30,15 @@ const ThemePicker: React.FC = () => {
     } else {
       // If no preference, use system theme
       applySystemTheme();
+    }
+
+    // Apply saved color theme if available
+    if (savedColor) {
+      setThemeColor(savedColor);
+      applyColorTheme(savedColor);
+    } else {
+      // Default to green
+      applyColorTheme("green");
     }
   }, []);
 
@@ -57,6 +69,19 @@ const ThemePicker: React.FC = () => {
     }
   };
 
+  const applyColorTheme = (color: ThemeColor) => {
+    // Remove existing color classes
+    document.documentElement.classList.remove("theme-green", "theme-blue", "theme-purple", "theme-orange", "theme-red");
+    // Add new color class
+    document.documentElement.classList.add(`theme-${color}`);
+    localStorage.setItem("paisa-pragati-color", color);
+  };
+
+  const setColorPreference = (newColor: ThemeColor) => {
+    setThemeColor(newColor);
+    applyColorTheme(newColor);
+  };
+
   const getThemeIcon = () => {
     switch (theme) {
       case "light":
@@ -75,7 +100,8 @@ const ThemePicker: React.FC = () => {
           {getThemeIcon()}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>Theme Mode</DropdownMenuLabel>
         <DropdownMenuItem onClick={() => setThemePreference("light")} className="flex items-center gap-2">
           <Sun className="h-4 w-4" />
           <span>Light</span>
@@ -87,6 +113,33 @@ const ThemePicker: React.FC = () => {
         <DropdownMenuItem onClick={() => setThemePreference("system")} className="flex items-center gap-2">
           <Laptop className="h-4 w-4" />
           <span>System</span>
+        </DropdownMenuItem>
+        
+        <DropdownMenuSeparator />
+        
+        <DropdownMenuLabel className="flex items-center gap-2">
+          <Palette className="h-4 w-4" />
+          <span>Color Theme</span>
+        </DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => setColorPreference("green")} className="flex items-center gap-2">
+          <div className="h-4 w-4 rounded-full bg-green-500" />
+          <span>Green</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setColorPreference("blue")} className="flex items-center gap-2">
+          <div className="h-4 w-4 rounded-full bg-blue-500" />
+          <span>Blue</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setColorPreference("purple")} className="flex items-center gap-2">
+          <div className="h-4 w-4 rounded-full bg-purple-500" />
+          <span>Purple</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setColorPreference("orange")} className="flex items-center gap-2">
+          <div className="h-4 w-4 rounded-full bg-orange-500" />
+          <span>Orange</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setColorPreference("red")} className="flex items-center gap-2">
+          <div className="h-4 w-4 rounded-full bg-red-500" />
+          <span>Red</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -54,12 +54,12 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				money: {
-					primary: '#4CAF50',
-					secondary: '#8BC34A',
-					accent: '#03A9F4',
-					highlight: '#2196F3',
-					light: '#E8F5E9',
-					dark: '#1B5E20'
+					primary: 'hsl(var(--money-primary))',
+					secondary: 'hsl(var(--money-secondary))',
+					accent: 'hsl(var(--money-accent))',
+					highlight: 'hsl(var(--money-highlight))',
+					light: 'hsl(var(--money-light))',
+					dark: 'hsl(var(--money-dark))'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
@@ -109,8 +109,8 @@ export default {
 				'money-pulse': 'money-pulse 2s ease-in-out infinite'
 			},
 			backgroundImage: {
-				'money-gradient': 'linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%)',
-				'money-accent': 'linear-gradient(135deg, #03A9F4 0%, #2196F3 100%)'
+				'money-gradient': 'linear-gradient(135deg, hsl(var(--money-primary)) 0%, hsl(var(--money-secondary)) 100%)',
+				'money-accent': 'linear-gradient(135deg, hsl(var(--money-accent)) 0%, hsl(var(--money-highlight)) 100%)'
 			}
 		}
 	},

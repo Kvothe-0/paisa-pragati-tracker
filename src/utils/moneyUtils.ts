@@ -11,21 +11,18 @@ export const formatToIndianCurrency = (amount: number): string => {
   let formattedWholePart = '';
   const wholePartStr = wholePart;
   
-  // Handle first part (up to last 3 digits)
-  const firstPartEndIndex = wholePartStr.length % 2 === 1 ? 1 : 2;
-  
   if (wholePartStr.length <= 3) {
     formattedWholePart = wholePartStr;
   } else {
-    // Add the first chunk (could be 1 or 2 digits)
-    if (firstPartEndIndex > 0) {
-      formattedWholePart = wholePartStr.substring(0, firstPartEndIndex);
-    }
+    // First add the last 3 digits
+    formattedWholePart = wholePartStr.substring(wholePartStr.length - 3);
     
-    // Add remaining chunks in pairs (for Indian format)
-    for (let i = firstPartEndIndex; i < wholePartStr.length; i += 2) {
-      if (i > 0) formattedWholePart += ',';
-      formattedWholePart += wholePartStr.substring(i, Math.min(i + 2, wholePartStr.length));
+    // Then add the rest in groups of 2 from right to left
+    for (let i = wholePartStr.length - 3; i > 0; i -= 2) {
+      formattedWholePart = 
+        (i === 1 ? wholePartStr.substring(0, 1) : wholePartStr.substring(i - 2, i)) + 
+        ',' + 
+        formattedWholePart;
     }
   }
   
@@ -147,30 +144,37 @@ export const formatDate = (date: Date): string => {
   return `${day}/${month}/${year}`;
 };
 
-// Calculate projection data for the table
+// Calculate projection data for the table - yearly intervals
 export const calculateProjectionData = (
   initialAmount: number,
   finalAmount: number,
-  timeYears: number,
-  dataPoints: number = 5
+  timeYears: number
 ): Array<{ date: string; amount: number; growth: number }> => {
   const data = [];
   const currentDate = new Date();
   const msPerYear = 365 * 24 * 60 * 60 * 1000;
   
-  // Calculate compound growth rate
-  const rate = Math.pow(finalAmount / initialAmount, 1 / timeYears) - 1;
+  // Calculate compound annual growth rate
+  const cagr = Math.pow(finalAmount / initialAmount, 1 / timeYears) - 1;
   
-  for (let i = 0; i <= dataPoints; i++) {
-    const yearFraction = i * (timeYears / dataPoints);
-    const futureDate = new Date(currentDate.getTime() + yearFraction * msPerYear);
-    const projectedAmount = initialAmount * Math.pow(1 + rate, yearFraction);
-    const growth = i === 0 ? 0 : (projectedAmount / data[i-1].amount - 1) * 100;
+  // Add initial entry
+  data.push({
+    date: formatDate(currentDate),
+    amount: initialAmount,
+    growth: 0
+  });
+  
+  // Add yearly entries
+  for (let year = 1; year <= timeYears; year++) {
+    const futureDate = new Date(currentDate.getTime() + year * msPerYear);
+    const projectedAmount = initialAmount * Math.pow(1 + cagr, year);
+    const previousAmount = initialAmount * Math.pow(1 + cagr, year - 1);
+    const yearlyGrowth = (projectedAmount / previousAmount - 1) * 100;
     
     data.push({
       date: formatDate(futureDate),
       amount: projectedAmount,
-      growth: growth
+      growth: yearlyGrowth
     });
   }
   
